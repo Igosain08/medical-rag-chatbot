@@ -33,7 +33,8 @@ RUN if [ -d "data" ] && [ "$(ls -A data/*.pdf 2>/dev/null)" ]; then \
 ## Expose only flask port
 EXPOSE 5000
 
-## Run the Flask app
-CMD ["python", "app/application.py"]
+## Add health check endpoint
+## Run the Flask app with explicit Python
+CMD ["python", "-u", "app/application.py"]
 
 

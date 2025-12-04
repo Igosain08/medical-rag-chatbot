@@ -51,8 +51,22 @@ def clear():
     session.pop("messages" , None)
     return redirect(url_for("index"))
 
+@app.route("/health")
+def health():
+    """Health check endpoint for App Runner"""
+    return {"status": "healthy", "service": "medical-rag-chatbot"}, 200
+
 if __name__=="__main__":
-    app.run(host="0.0.0.0" , port=5000 , debug=False , use_reloader = False)
+    import sys
+    try:
+        print("Starting Flask application...", flush=True)
+        print(f"HF_TOKEN present: {HF_TOKEN is not None}", flush=True)
+        app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
+    except Exception as e:
+        print(f"Failed to start Flask app: {str(e)}", flush=True)
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
 
 
