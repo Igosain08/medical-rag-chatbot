@@ -59,13 +59,17 @@ def health():
 if __name__=="__main__":
     import sys
     try:
+        print("=" * 50, flush=True)
         print("Starting Flask application...", flush=True)
         print(f"HF_TOKEN present: {HF_TOKEN is not None}", flush=True)
+        print(f"Listening on: 0.0.0.0:5000", flush=True)
+        print("=" * 50, flush=True)
         app.run(host="0.0.0.0", port=5000, debug=False, use_reloader=False)
     except Exception as e:
-        print(f"Failed to start Flask app: {str(e)}", flush=True)
+        print(f"CRITICAL: Failed to start Flask app: {str(e)}", flush=True)
         import traceback
-        traceback.print_exc()
+        traceback.print_exc(file=sys.stdout)
+        sys.stdout.flush()
         sys.exit(1)
 
 
