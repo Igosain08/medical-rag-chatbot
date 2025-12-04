@@ -17,8 +17,18 @@ RUN apt-get update && apt-get install -y \
 ## Copying all contents from local to container
 COPY . .
 
+## Copy vectorstore if it exists (needed for the app to run)
+COPY vectorstore/ vectorstore/ 2>/dev/null || echo "Vectorstore will be created at runtime if needed"
+
 ## Install Python dependencies
 RUN pip install --no-cache-dir -e .
+
+## Create vectorstore during build (if data exists)
+RUN if [ -d "data" ] && [ "$(ls -A data/*.pdf 2>/dev/null)" ]; then \
+        python -m app.components.data_loader || echo "Vectorstore creation skipped or failed"; \
+    else \
+        echo "No PDF data found, vectorstore will be empty"; \
+    fi
 
 ## Expose only flask port
 EXPOSE 5000
