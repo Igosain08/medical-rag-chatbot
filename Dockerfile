@@ -30,11 +30,13 @@ RUN if [ -d "data" ] && [ "$(ls -A data/*.pdf 2>/dev/null)" ]; then \
         echo "No PDF data found, vectorstore will be empty"; \
     fi
 
+## Make start script executable
+RUN chmod +x start.sh
+
 ## Expose only flask port
 EXPOSE 5000
 
-## Add health check endpoint
-## Run the Flask app with explicit Python
-CMD ["python", "-u", "app/application.py"]
+## Run the Flask app using start script
+CMD ["./start.sh"]
 
 
