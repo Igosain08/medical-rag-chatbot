@@ -30,6 +30,9 @@ def index():
 
             try:
                 qa_chain = create_qa_chain()
+                if qa_chain is None:
+                    error_msg = "Error: Unable to initialize QA chain. Vector store may be missing."
+                    return render_template("index.html" , messages = session["messages"] , error = error_msg)
                 response = qa_chain.invoke({"query" : user_input})
                 result = response.get("result" , "No response")
 
