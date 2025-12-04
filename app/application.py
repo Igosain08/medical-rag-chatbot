@@ -1,13 +1,25 @@
 from flask import Flask,render_template,request,session,redirect,url_for
-from app.components.retriever import create_qa_chain
 from dotenv import load_dotenv
 import os
+import sys
 
+# Load environment variables
 load_dotenv()
 HF_TOKEN = os.environ.get("HF_TOKEN")
 
+# Create Flask app
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ.get("SECRET_KEY", os.urandom(24).hex())
+
+# Lazy import to avoid startup failures
+# Only import retriever when needed (on first request)
+qa_chain_module = None
+def get_qa_chain():
+    global qa_chain_module
+    if qa_chain_module is None:
+        from app.components.retriever import create_qa_chain
+        qa_chain_module = create_qa_chain
+    return qa_chain_module()
 
 from markupsafe import Markup
 def nl2br(value):
@@ -29,7 +41,7 @@ def index():
             session["messages"] = messages
 
             try:
-                qa_chain = create_qa_chain()
+                qa_chain = get_qa_chain()
                 if qa_chain is None:
                     error_msg = "Error: Unable to initialize QA chain. Vector store may be missing."
                     return render_template("index.html" , messages = session["messages"] , error = error_msg)

@@ -29,6 +29,7 @@ echo "Starting Flask application on 0.0.0.0:5000..."
 echo "=========================================="
 echo ""
 
-# Start Flask app
-exec python -u app/application.py
+# Start Flask app with gunicorn for production
+# Use gunicorn for better production stability
+exec gunicorn --bind 0.0.0.0:5000 --workers 1 --threads 2 --timeout 120 --access-logfile - --error-logfile - --log-level info "app.application:app"
 
