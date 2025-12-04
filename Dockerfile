@@ -17,17 +17,16 @@ RUN apt-get update && apt-get install -y \
 ## Copying all contents from local to container
 COPY . .
 
-## Copy vectorstore if it exists (needed for the app to run)
-COPY vectorstore/ vectorstore/ 2>/dev/null || echo "Vectorstore will be created at runtime if needed"
-
 ## Install Python dependencies
 RUN pip install --no-cache-dir -e .
 
 ## Create vectorstore during build (if data exists)
+## This will create the vectorstore from PDFs in the data/ directory
 RUN if [ -d "data" ] && [ "$(ls -A data/*.pdf 2>/dev/null)" ]; then \
-        python -m app.components.data_loader || echo "Vectorstore creation skipped or failed"; \
+        echo "Creating vectorstore from PDF data..." && \
+        python -m app.components.data_loader || echo "Vectorstore creation failed, app will still start"; \
     else \
-        echo "No PDF data found, vectorstore will be empty"; \
+        echo "No PDF data found, vectorstore will be created at runtime if needed"; \
     fi
 
 ## Make start script executable
